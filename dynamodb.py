@@ -3,7 +3,6 @@ from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from botocore.exceptions import ClientError
 from vars import *
 from time import sleep
-import json
 from os import environ
 from decimal import Decimal
 

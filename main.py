@@ -1,14 +1,11 @@
-import json
 import requests
-import boto3
-import dynamodb
 from vars import *
-from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from dynamodb import normal_dict_to_dynamodb_item, App as DynamoApp
 import datetime
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(category=InsecureRequestWarning)
+
 
 def flatten(d):
     res = {}
