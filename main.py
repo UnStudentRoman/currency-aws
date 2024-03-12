@@ -1,10 +1,15 @@
+import json
 import requests
 from vars import *
 from dynamodb import normal_dict_to_dynamodb_item, App as DynamoApp
+from s3 import upload_file
 import datetime
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(category=InsecureRequestWarning)
+from decimal import Decimal
+from os.path import isfile, join
+from os import listdir
 
 
 def flatten(d):
@@ -87,15 +92,13 @@ if __name__ == '__main__':
     # Add all items to DynamoDB
     client.put_items(table_name, items=single_response)
 
+    print('Read table entries.')
+    table_items = client.read_table(table_name)
+    table_items = [{k: (float(v) if isinstance(v, Decimal) else v) for k, v in item.items()} for item in table_items]
+    table_items = [{item['date']: item} for item in table_items]
 
-"""
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-====================================== TO DO ======================================
+    with open(file='data.json', mode='w') as f:
+        json.dump(table_items, f)
 
-# Make deserialization work
-# Connect to S3
-# Add to S3 the number of rows in DynamoDB table
-
-===================================================================================
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-"""
+    file_name = 'data.json'
+    upload_file(file_name=file_name, bucket=s3_bucket)

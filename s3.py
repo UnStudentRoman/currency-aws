@@ -1,11 +1,10 @@
 import logging
 import boto3
 from botocore.exceptions import ClientError
-import os
 import sys
 import threading
-from os import listdir
-from os.path import isfile, join
+from os import listdir, environ
+from os.path import isfile, join, getsize, basename
 
 
 
@@ -13,7 +12,7 @@ class ProgressPercentage(object):
 
     def __init__(self, filename):
         self._filename = filename
-        self._size = float(os.path.getsize(filename))
+        self._size = float(getsize(filename))
         self._seen_so_far = 0
         self._lock = threading.Lock()
 
@@ -40,12 +39,12 @@ def upload_file(file_name, bucket, object_name=None):
 
     # If S3 object_name was not specified, use file_name
     if object_name is None:
-        object_name = os.path.basename(file_name)
+        object_name = basename(file_name)
 
     # Upload the file
     s3_client = boto3.client('s3',
-                             aws_access_key_id='AKIAYS2NV7OMBKFDR5RN',
-                             aws_secret_access_key='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',
+                             aws_access_key_id=environ.get('AWS_ACCESS_KEY'),
+                             aws_secret_access_key=environ.get('AWS_SECRET_ACCESS_KEY'),
                              region_name='eu-north-1')
     try:
         response = s3_client.upload_file(file_name, bucket, object_name,

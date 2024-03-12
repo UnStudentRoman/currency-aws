@@ -6,6 +6,7 @@ from time import sleep
 from os import environ
 from decimal import Decimal
 
+
 def normal_dict_to_dynamodb_item(normal_dict):
     """
     Take a DynamoDB formatted dictionary and change it to normal JSON format
@@ -87,13 +88,18 @@ class App():
             print('Item put.')
         return None
 
+    def read_table(self, table_name):
+        return [dynamodb_item_to_normal_dict(item) for item in self.client.scan(TableName=table_name)['Items']]
+
 
 if __name__ == '__main__':
 
     client = boto3.client('dynamodb',
-                          aws_access_key_id='AKIAYS2NV7OMBKFDR5RN',
-                          aws_secret_access_key='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',
+                          aws_access_key_id=environ.get('AWS_ACCESS_KEY'),
+                          aws_secret_access_key=environ.get('AWS_SECRET_ACCESS_KEY'),
                           region_name='eu-north-1')
+
+    response = client.scan(TableName='Currency')
 
     # Check if table already exits.
     table_list = client.list_tables(Limit=10)
