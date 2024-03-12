@@ -51,8 +51,8 @@ class App():
 
     def generate_client(self):
         self.client = boto3.client(service_name=self.service, region_name=self.region,
-                      aws_access_key_id='AKIAYS2NV7OMBKFDR5RN',
-                      aws_secret_access_key='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')
+                      aws_access_key_id='',
+                      aws_secret_access_key='')
         print('Client generated.')
         return None
 
