@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 from vars import *
 from time import sleep
 import json
+from os import environ
 from decimal import Decimal
 
 def normal_dict_to_dynamodb_item(normal_dict):
@@ -51,8 +52,8 @@ class App():
 
     def generate_client(self):
         self.client = boto3.client(service_name=self.service, region_name=self.region,
-                      aws_access_key_id='',
-                      aws_secret_access_key='')
+                      aws_access_key_id=environ.get('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=environ.get('AWS_SECRET_ACCESS_KEY'))
         print('Client generated.')
         return None
 
