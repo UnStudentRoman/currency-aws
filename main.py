@@ -10,6 +10,7 @@ urllib3.disable_warnings(category=InsecureRequestWarning)
 from decimal import Decimal
 from os.path import isfile, join
 from os import listdir
+from secretRetriever import get_secret
 
 
 def flatten(d):
@@ -59,6 +60,13 @@ def get_batch_response(no_days):
 
 
 if __name__ == '__main__':
+    # If we don't get the secret the code breaks.
+    secret = get_secret()
+    if secret != 'Marius':
+        print("FAILED TO GET SECRET")
+    else:
+        print('SECRET OK')
+
     # Get API data
     print('Calling API.')
     response = get_response()
