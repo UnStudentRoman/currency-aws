@@ -28,7 +28,7 @@ class ProgressPercentage(object):
             sys.stdout.flush()
 
 
-def upload_file(file_name, bucket, object_name=None):
+def upload_file(file_name, bucket, object_name=None, metadata_header = None):
     """Upload a file to an S3 bucket
 
     :param file_name: File to upload
@@ -48,18 +48,26 @@ def upload_file(file_name, bucket, object_name=None):
                              region_name='eu-north-1')
     try:
         response = s3_client.upload_file(file_name, bucket, object_name,
-                                         Callback=ProgressPercentage(file_name))
+                                         Callback=ProgressPercentage(file_name), ExtraArgs=metadata_header)
     except ClientError as e:
         logging.error(e)
         return False
     return True
 
 
+def metadata_headers(file):
+    if file.split('.')[-1] == 'html':
+        return {'ContentType': 'text/html'}
+    elif file.split('.')[-1] == 'css':
+        return {'ContentType': 'text/css'}
+    else:
+        return None
+
+
 if __name__ == '__main__':
     bucket = 'cmarius97-s3-test'
-    # file_name = 'test.json'
-
     onlyfiles = [f for f in listdir('website') if isfile(join('website', f))]
+    onlyfiles = [{'file_name': file,'Metadata':metadata_headers(file)} for file in onlyfiles]
 
     for file in onlyfiles:
-        upload_file(file_name=f'website/{file}', bucket=bucket, object_name=file)
+        upload_file(file_name=f'website/{file["file_name"]}', metadata_header=file["Metadata"] , bucket=bucket, object_name=file["file_name"])
