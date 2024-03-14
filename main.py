@@ -95,10 +95,23 @@ if __name__ == '__main__':
     print('Read table entries.')
     table_items = client.read_table(table_name)
     table_items = [{k: (float(v) if isinstance(v, Decimal) else v) for k, v in item.items()} for item in table_items]
-    table_items = [{item['date']: item} for item in table_items]
+    # table_items = [{item['date']: item} for item in table_items]
+
+    transformed_data = {}
+
+    for item in table_items:
+        date = item["date"]
+        currencies = {key: value for key, value in item.items() if key != "date"}
+
+        if date not in transformed_data:
+            transformed_data[date] = {"currency": currencies}
+        else:
+            transformed_data[date]["currency"].update(currencies)
+
+    print(transformed_data)
 
     with open(file='data.json', mode='w') as f:
-        json.dump(table_items, f)
+        json.dump(transformed_data, f)
 
     file_name = 'data.json'
     upload_file(file_name=file_name, bucket=s3_bucket)
